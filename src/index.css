@@ -1,5 +1,18 @@
+@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Variables CSS para colores */
+:root {
+  --color-primary: #1976d2;     /* Azul primario */
+  --color-secondary: #43a047;   /* Verde secundario */
+  --color-background: #f5f5f5;  /* Gris claro */
+  --color-error: #e53935;       /* Rojo error */
+  --color-text: #212121;        /* Negro texto */
+}
+
+/* Aplica fuente Roboto globalmente */
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-text);
+}

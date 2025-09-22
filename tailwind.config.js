@@ -3,11 +3,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: "#1976d2",     // Azul primario
-        secondary: "#43a047",   // Verde secundario
-        background: "#f5f5f5",  // Gris claro
-        error: "#e53935",       // Rojo error
-        text: "#212121",        // Negro texto
+        primary: "var(--color-primary)",
+        secondary: "var(--color-secondary)",
+        background: "var(--color-background)",
+        error: "var(--color-error)",
+        text: "var(--color-text)",
       },
       fontFamily: {
         sans: ["Roboto", "sans-serif"],
