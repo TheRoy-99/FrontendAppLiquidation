@@ -1,12 +1,14 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Login from "../pages/Login";
+import Auth from "../pages/Auth";
+import RecoverPass from "../pages/RecoverPass";
 
 export function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Página principal */}
-        <Route path="/" element={<Login />} />
+        {/* endpoints */}
+        <Route path="/login" element={<Auth />} />
+        <Route path="/recover" element={<RecoverPass />} />
 
         {/* Ruta de prueba opcional */}
         <Route path="/test" element={<h1 className="text-2xl">Bienvenido 🚀</h1>} />
