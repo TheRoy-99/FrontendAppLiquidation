@@ -1,6 +1,7 @@
 import { useState } from "react";
 import logo from "../assets/logo2.png";
 import InputField from "../components/InputField";
+import { api } from "../services/api";
 
 enum AuthTab {
   LOGIN = "login",
@@ -22,18 +23,43 @@ export default function Auth() {
     confirmPassword: "",
   });
 
-  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Login con:", loginData);
+    try {
+      const res = await api.post("/auth/login", loginData);
+
+      // Guardar token en localStorage
+      localStorage.setItem("token", res.data.access_token);
+
+      console.log("Login exitoso:", res.data);
+    } catch (error: any) {
+      console.error("Error login:", error.response?.data || error.message);
+      alert("Credenciales inválidas");
+    }
   };
 
-  const handleRegister = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (registerData.password !== registerData.confirmPassword) {
       alert("Las contraseñas no coinciden");
       return;
     }
-    console.log("📝 Registro con:", registerData);
+
+    try {
+      const res = await api.post("/auth/register", {
+        nombreCompleto: registerData.nombre,
+        email: registerData.email,
+        telefono: registerData.telefono,
+        password: registerData.password,
+      });
+
+      console.log("Registro exitoso:", res.data);
+      alert("Usuario registrado correctamente");
+      setActiveTab(AuthTab.LOGIN);
+    } catch (error: any) {
+      console.error("Error registro:", error.response?.data || error.message);
+      alert("No se pudo registrar");
+    }
   };
 
   const goToForgotPassword = () => {
@@ -61,21 +87,19 @@ export default function Auth() {
         <div className="flex mb-6 bg-gray-100 rounded-lg overflow-hidden">
           <button
             onClick={() => setActiveTab(AuthTab.LOGIN)}
-            className={`flex-1 py-2 text-sm font-medium transition ${
-              activeTab === AuthTab.LOGIN
+            className={`flex-1 py-2 text-sm font-medium transition ${activeTab === AuthTab.LOGIN
                 ? "bg-blue-600 text-white"
                 : "text-gray-500 hover:text-blue-600"
-            }`}
+              }`}
           >
             Iniciar Sesión
           </button>
           <button
             onClick={() => setActiveTab(AuthTab.REGISTER)}
-            className={`flex-1 py-2 text-sm font-medium transition ${
-              activeTab === AuthTab.REGISTER
+            className={`flex-1 py-2 text-sm font-medium transition ${activeTab === AuthTab.REGISTER
                 ? "bg-blue-600 text-white"
                 : "text-gray-500 hover:text-blue-600"
-            }`}
+              }`}
           >
             Registrarse
           </button>
