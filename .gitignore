@@ -23,7 +23,14 @@ dist-ssr
 *.sln
 *.sw?
 
+<<<<<<< Updated upstream
 # Variables de entorno
 .env
 .env.local 
 .env.*
+=======
+#variables entorno env
+.env
+.env.*.local
+.env.local 
+>>>>>>> Stashed changes
