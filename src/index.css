@@ -16,3 +16,15 @@ body {
   background-color: var(--color-background);
   color: var(--color-text);
 }
+
+.swal-popup {
+  border-radius: 12px;
+  padding: 1.5rem;
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+
+.swal-button {
+  background-color: var(--color-primary);
+  color: white;
+}
