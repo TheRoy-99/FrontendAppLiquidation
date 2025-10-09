@@ -1,27 +1,70 @@
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import RecoverPass from "../pages/RecoverPass";
-import ResetPassword from "../pages/ResetPassword"; // 👈 nuevo
+import ResetPassword from "../pages/ResetPassword";
 import Login from "../pages/Login";
-import Register from "../pages/Register";
+import { ProtectedRoute } from "../components/ProtectedRoute";
+import DashboardAdmin from "../pages/admin/DashboardAdmin";
+import DashboardUser from "../pages/user/DashboardUser";
 
 export function AppRouter() {
+  let user = null;
+  try {
+    const stored = localStorage.getItem("user");
+    user = stored ? JSON.parse(stored) : null;
+  } catch {
+    user = null;
+  }
+
+
+
   return (
     <BrowserRouter>
       <Routes>
+        {/*Redirección inicial */}
+        <Route
+          path="/"
+          element={
+            user ? (
+              user.role === "ADMIN" ? (
+                <Navigate to="/admin/dashboard" replace />
+              ) : (
+                <Navigate to="/user/dashboard" replace />
+              )
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+
         {/* Login */}
         <Route path="/login" element={<LoginWrapper />} />
 
-        {/* Register */}
-        <Route path="/register" element={<RegisterWrapper />} />
-
         {/* Recover Password */}
         <Route path="/recover" element={<RecoverPassWrapper />} />
+        <Route path="/reset-password/:token" element={<ResetPasswordWrapper />} />
 
-        {/* Reset Password */}
-        <Route path="/reset-password" element={<ResetPasswordWrapper />} />
+        {/* USER Dashboard */}
+        <Route
+          path="/user/dashboard"
+          element={
+            <ProtectedRoute role="USER">
+              <DashboardUser />
+            </ProtectedRoute>
+          }
+        />
 
-        {/* Ruta de prueba opcional */}
-        <Route path="/test" element={<h1 className="text-2xl">Bienvenido 🚀</h1>} />
+        {/* ADMIN Dashboard */}
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute role="ADMIN">
+              <DashboardAdmin />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Default */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
   );
@@ -31,17 +74,8 @@ export function AppRouter() {
 function LoginWrapper() {
   const navigate = useNavigate();
   return (
-    <Login
-      onSwitchToRegister={() => navigate("/register")}
-      onForgotPassword={() => navigate("/recover")}
-    />
+    <Login onForgotPassword={() => navigate("/recover")} />
   );
-}
-
-// Wrapper para Register
-function RegisterWrapper() {
-  const navigate = useNavigate();
-  return <Register onSwitchToLogin={() => navigate("/login")} />;
 }
 
 // Wrapper para Recover Password
