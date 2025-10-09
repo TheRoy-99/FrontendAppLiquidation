@@ -1,25 +1,81 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { authService } from "../services/authService";
-import { alertSuccess, alertError, alertInfo } from "../utils/alerts";
+import {
+    alertLoginSuccess,
+    alertError,
+    alertInfo,
+    alertSuccess,
+} from "../utils/alerts";
+import { jwtDecode } from "jwt-decode";
 
 export function useAuth() {
     const [loading, setLoading] = useState(false);
+    const [user, setUser] = useState<any>(null);
 
+    //Recuperar sesión al recargar
+    useEffect(() => {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) setUser(JSON.parse(storedUser));
+    }, []);
+
+    //Login con alerta de bienvenida mejorada
     const login = async (email: string, password: string) => {
         setLoading(true);
         try {
             const res = await authService.login({ email, password });
-            localStorage.setItem("token", res.data.access_token);
-            alertSuccess("Bienvenido 🚀", "Inicio de sesión exitoso");
-            return res.data;
+            const { access_token } = res.data;
+
+            //Decodificamos el token JWT
+            const decoded: any = jwtDecode(access_token);
+
+            const userData = {
+                id: decoded.sub,
+                email: decoded.email,
+                role: decoded.role,
+                nombreCompleto: decoded.nombreCompleto || null, // por si el backend lo incluye
+            };
+
+            //Guardar datos locales
+            localStorage.setItem("token", access_token);
+            localStorage.setItem("user", JSON.stringify(userData));
+            setUser(userData);
+
+            // Alerta visual de bienvenida (SweetAlert2)
+            alertLoginSuccess(userData.nombreCompleto || userData.email?.split("@")[0]);
+
+            //Redirección por rol
+            setTimeout(() => {
+                if (userData.role === "ADMIN") {
+                    window.location.href = "/admin/dashboard";
+                } else {
+                    window.location.href = "/user/dashboard";
+                }
+            }, 1600); // Espera breve para que la alerta se vea completa
+
+            return userData;
         } catch (error: any) {
-            alertError("Error", error.response?.data?.message || "Credenciales inválidas");
+            alertError("Error de inicio de sesión", error.response?.data?.message || "Credenciales inválidas");
             throw error;
         } finally {
             setLoading(false);
         }
     };
 
+    //Logout con confirmación de alerta tipo modal
+    const logout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        setUser(null);
+
+        // Mostrar alerta de cierre (ya tienes confirmLogoutAlert en tus dashboards)
+        alertInfo("Sesión cerrada", "Has cerrado sesión correctamente");
+
+        setTimeout(() => {
+            window.location.href = "/login";
+        }, 1500);
+    };
+
+    //Registro con alertas SweetAlert2
     const register = async (
         nombre: string,
         email: string,
@@ -40,48 +96,31 @@ export function useAuth() {
                 telefono,
                 password,
             });
-            alertSuccess("Registro exitoso", "Ya puedes iniciar sesión");
+
+            alertSuccess("Registro exitoso", "Usuario registrado correctamente");
             return true;
         } catch (error: any) {
-            alertError("Error", error.response?.data?.message || "No se pudo registrar");
+            alertError("Error", error.response?.data?.message || "No se pudo registrar el usuario");
             return false;
         } finally {
             setLoading(false);
         }
     };
 
+    //Recuperar contraseña
     const recover = async (email: string) => {
         setLoading(true);
         try {
             await authService.recover(email);
-            alertSuccess("Correo enviado 📩", "Revisa tu bandeja de entrada");
+            alertSuccess("Correo enviado", "Revisa tu bandeja de entrada para restablecer tu contraseña.");
             return true;
         } catch (error: any) {
-            alertError("Error", error.response?.data?.message || "No se pudo enviar el correo");
+            alertError("Error", error.response?.data?.message || "No se pudo enviar el correo de recuperación.");
             return false;
         } finally {
             setLoading(false);
         }
     };
 
-    const resetPassword = async (token: string, newPassword: string) => {
-        setLoading(true);
-        try {
-            await authService.resetPassword({ token, newPassword });
-            alertSuccess("Contraseña actualizada 🔒", "Ya puedes iniciar sesión");
-            return true;
-        } catch (error: any) {
-            alertError("Error", error.response?.data?.message || "No se pudo cambiar la contraseña");
-            return false;
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const logout = () => {
-        localStorage.removeItem("token");
-        alertInfo("Sesión cerrada", "Has cerrado sesión correctamente");
-    };
-
-    return { login, register, recover, resetPassword, logout, loading };
+    return { user, login, logout, register, recover, loading };
 }
