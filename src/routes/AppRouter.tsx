@@ -5,6 +5,8 @@ import Login from "../pages/Login";
 import { ProtectedRoute } from "../components/ProtectedRoute";
 import DashboardAdmin from "../pages/admin/DashboardAdmin";
 import DashboardUser from "../pages/user/DashboardUser";
+import Principal from "../pages/Principal";
+import Chatbot from "../pages/Chatbot";
 
 export function AppRouter() {
   let user = null;
@@ -15,34 +17,33 @@ export function AppRouter() {
     user = null;
   }
 
-
-
   return (
     <BrowserRouter>
       <Routes>
-        {/*Redirección inicial */}
+        {/* Solo una ruta para "/" */}
         <Route
           path="/"
           element={
             user ? (
               user.role === "ADMIN" ? (
                 <Navigate to="/admin/dashboard" replace />
-              ) : (
+              ) : user.role === "USER" ? (
                 <Navigate to="/user/dashboard" replace />
+              ) : (
+                <Principal />
               )
             ) : (
-              <Navigate to="/login" replace />
+              <Principal />
             )
           }
         />
-
+        {/* Chatbot */}
+        <Route path="/Chatbot" element={<Chatbot />} />
         {/* Login */}
         <Route path="/login" element={<LoginWrapper />} />
-
         {/* Recover Password */}
         <Route path="/recover" element={<RecoverPassWrapper />} />
         <Route path="/reset-password/:token" element={<ResetPasswordWrapper />} />
-
         {/* USER Dashboard */}
         <Route
           path="/user/dashboard"
@@ -52,7 +53,6 @@ export function AppRouter() {
             </ProtectedRoute>
           }
         />
-
         {/* ADMIN Dashboard */}
         <Route
           path="/admin/dashboard"
@@ -62,9 +62,8 @@ export function AppRouter() {
             </ProtectedRoute>
           }
         />
-
-        {/* Default */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        {/* Default (404) → portada */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
