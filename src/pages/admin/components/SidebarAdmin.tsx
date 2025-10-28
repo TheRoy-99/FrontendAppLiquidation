@@ -1,93 +1,115 @@
+import { useState } from "react";
 import {
     FiHome,
-    FiUser,
-    FiUserPlus,
+    FiUsers,
     FiFileText,
     FiBarChart2,
     FiSettings,
-    FiChevronLeft,
-    FiChevronRight,
-    FiLogOut,
+    FiX,
 } from "react-icons/fi";
-import { useState } from "react";
-import { useAuth } from "../../../hooks/useAuth";
-import { confirmLogoutAlert } from "../../../utils/alerts";
 
-interface SidebarProps {
+interface SidebarAdminProps {
     activePanel: string;
     setActivePanel: (panel: string) => void;
+    isOpen: boolean;
+    setIsOpen: (open: boolean) => void;
 }
 
-export default function SidebarAdmin({ activePanel, setActivePanel }: SidebarProps) {
-    const [collapsed, setCollapsed] = useState(false);
-    const { logout } = useAuth();
-
-    const menuItems = [
-        { id: "inicio", label: "Inicio", icon: <FiHome /> },
-        { id: "perfil", label: "Perfil", icon: <FiUser /> }, // 👈 nuevo
-        { id: "usuarios", label: "Usuarios", icon: <FiUserPlus /> },
-        { id: "recibos", label: "Recibos", icon: <FiFileText /> },
-        { id: "reportes", label: "Reportes", icon: <FiBarChart2 /> },
-        { id: "config", label: "Configuración", icon: <FiSettings /> },
-    ];
-
-    const handleLogout = async () => {
-        const confirmed = await confirmLogoutAlert("¿Cerrar sesión?");
-        if (confirmed) logout();
+export default function SidebarAdmin({
+    activePanel,
+    setActivePanel,
+    isOpen,
+    setIsOpen,
+}: SidebarAdminProps) {
+    const handleNav = (panel: string) => {
+        setActivePanel(panel);
+        setIsOpen(false);
     };
 
     return (
-        <aside
-            className={`hidden lg:flex flex-col justify-between ${collapsed ? "w-20" : "w-60"
-                } bg-white border-r border-gray-200 py-6 px-4 shadow-sm transition-all duration-300`}
-        >
-            {/* Parte superior */}
-            <div>
-                <div className="flex justify-between items-center mb-6">
-                    {!collapsed && (
-                        <h2 className="text-lg font-semibold text-gray-700">Panel Admin</h2>
-                    )}
-                    <button
-                        onClick={() => setCollapsed(!collapsed)}
-                        className="p-1 rounded hover:bg-gray-100 transition"
-                    >
-                        {collapsed ? (
-                            <FiChevronRight className="text-gray-600" />
-                        ) : (
-                            <FiChevronLeft className="text-gray-600" />
-                        )}
-                    </button>
-                </div>
+        <>
+            {/* 🔹 Sidebar para escritorio */}
+            <aside className="hidden md:flex w-56 bg-white border-r border-gray-200 flex-col py-6 px-4">
+                <h2 className="text-lg font-semibold text-gray-800 mb-6 px-2">
+                    Panel Admin
+                </h2>
 
-                {/* Menú principal */}
-                <nav className="flex flex-col gap-2">
-                    {menuItems.map((item) => (
+                <nav className="flex-1 flex flex-col gap-1">
+                    {[
+                        { key: "inicio", icon: <FiHome />, label: "Inicio" },
+                        { key: "usuarios", icon: <FiUsers />, label: "Usuarios" },
+                        { key: "recibos", icon: <FiFileText />, label: "Recibos" },
+                        { key: "reportes", icon: <FiBarChart2 />, label: "Reportes" },
+                        { key: "config", icon: <FiSettings />, label: "Configuración" },
+                    ].map((item) => (
                         <button
-                            key={item.id}
-                            onClick={() => setActivePanel(item.id)}
-                            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-left text-sm font-medium transition
-              ${activePanel === item.id
-                                    ? "bg-blue-100 text-blue-700"
-                                    : "text-gray-600 hover:bg-gray-100"
+                            key={item.key}
+                            onClick={() => handleNav(item.key)}
+                            className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all ${activePanel === item.key
+                                    ? "bg-blue-50 text-blue-700"
+                                    : "text-gray-700 hover:bg-gray-100"
                                 }`}
                         >
-                            {item.icon}
-                            {!collapsed && item.label}
+                            {item.icon} {item.label}
                         </button>
                     ))}
                 </nav>
-            </div>
 
-            {/* Parte inferior: botón de logout */}
-            <div className="mt-8">
-                <button
-                    onClick={handleLogout}
-                    className="flex items-center gap-3 px-3 py-2 rounded-lg text-left text-sm font-medium text-red-600 hover:bg-red-50 transition"
-                >
-                    <FiLogOut />
-                    {!collapsed && "Cerrar sesión"}
-                </button>
-            </div>
-        </aside>
+                <div className="mt-auto text-center border-t pt-4 text-xs text-gray-400">
+                    © {new Date().getFullYear()} Servicios Públicos
+                </div>
+            </aside>
+
+            {/* 🔹 Drawer lateral para móvil */}
+            {isOpen && (
+                <div className="fixed inset-0 z-50 flex">
+                    {/* Fondo oscuro difuminado */}
+                    <div
+                        className="flex-1 bg-black/40 backdrop-blur-sm"
+                        onClick={() => setIsOpen(false)}
+                    />
+
+                    {/* Panel lateral */}
+                    <div className="w-64 bg-white h-full shadow-2xl p-5 flex flex-col animate-slideInRight">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-lg font-semibold text-gray-800">
+                                Panel Admin
+                            </h2>
+                            <button
+                                onClick={() => setIsOpen(false)}
+                                className="text-gray-600 hover:text-gray-800 transition"
+                            >
+                                <FiX size={22} />
+                            </button>
+                        </div>
+
+                        <nav className="flex-1 flex flex-col gap-1">
+                            {[
+                                { key: "inicio", icon: <FiHome />, label: "Inicio" },
+                                { key: "usuarios", icon: <FiUsers />, label: "Usuarios" },
+                                { key: "recibos", icon: <FiFileText />, label: "Recibos" },
+                                { key: "reportes", icon: <FiBarChart2 />, label: "Reportes" },
+                                { key: "config", icon: <FiSettings />, label: "Configuración" },
+                            ].map((item) => (
+                                <button
+                                    key={item.key}
+                                    onClick={() => handleNav(item.key)}
+                                    className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all ${activePanel === item.key
+                                            ? "bg-blue-50 text-blue-700"
+                                            : "text-gray-700 hover:bg-gray-100"
+                                        }`}
+                                >
+                                    {item.icon} {item.label}
+                                </button>
+                            ))}
+                        </nav>
+
+                        <div className="mt-auto text-center border-t pt-4 text-xs text-gray-400">
+                            © {new Date().getFullYear()} Servicios Públicos
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
     );
 }

@@ -1,11 +1,19 @@
 import { useEffect, useState } from "react";
 import api from "../../../services/api";
 import { alertError } from "../../../utils/alerts";
-import { FiMail, FiPhone } from "react-icons/fi";
+import { FiMail, FiPhone, FiEdit2, FiLock, FiLogOut } from "react-icons/fi";
+import { useAuth } from "../../../hooks/useAuth";
 
-export default function PerfilAdmin({ onBack }: { onBack: () => void }) {
+export default function PerfilAdmin({
+    onBack,
+    setActivePanel,
+}: {
+    onBack: () => void;
+    setActivePanel?: (panel: string) => void;
+}) {
     const [perfil, setPerfil] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const { logout } = useAuth();
 
     useEffect(() => {
         const fetchPerfil = async () => {
@@ -45,31 +53,66 @@ export default function PerfilAdmin({ onBack }: { onBack: () => void }) {
             .slice(0, 2) || "A";
 
     return (
-        <div className="flex flex-col items-center justify-center text-center">
-            <div className="bg-white rounded-xl shadow p-8 max-w-md w-full">
-                <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-blue-600 text-white flex items-center justify-center text-3xl font-bold shadow-md">
-                    {initials}
+        <div className="flex flex-col items-center justify-center text-center mt-6">
+            <div className="max-w-lg w-full p-8">
+                {/* Avatar */}
+                <div className="relative w-28 h-28 mx-auto mb-5">
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-600 to-blue-400 p-[3px]">
+                        <div className="w-full h-full bg-white rounded-full flex items-center justify-center text-3xl font-bold text-blue-600">
+                            {initials}
+                        </div>
+                    </div>
                 </div>
 
-                <h2 className="text-xl font-semibold text-gray-800">
+                {/* Info principal */}
+                <h2 className="text-2xl font-semibold text-gray-800">
                     {perfil.nombreCompleto || "Usuario sin nombre"}
                 </h2>
-                <p className="text-gray-500 uppercase text-sm mb-6">{perfil.role}</p>
+                <p className="text-gray-500 uppercase text-sm tracking-wide mb-8">
+                    {perfil.role}
+                </p>
 
-                <div className="space-y-3 text-left bg-gray-50 p-4 rounded-lg shadow-sm">
-                    <p className="flex items-center gap-2 text-gray-700">
-                        <FiMail className="text-blue-600" />
-                        <strong>Correo:</strong> {perfil.email}
+                {/* Datos */}
+                <div className="space-y-3 text-left mb-8">
+                    <p className="flex items-center gap-3 text-gray-700">
+                        <FiMail className="text-blue-600 text-lg" />
+                        <span>
+                            <strong>Correo:</strong> {perfil.email}
+                        </span>
                     </p>
-                    <p className="flex items-center gap-2 text-gray-700">
-                        <FiPhone className="text-purple-600" />
-                        <strong>Teléfono:</strong> {perfil.telefono || "No registrado"}
+                    <p className="flex items-center gap-3 text-gray-700">
+                        <FiPhone className="text-purple-600 text-lg" />
+                        <span>
+                            <strong>Teléfono:</strong> {perfil.telefono || "No registrado"}
+                        </span>
                     </p>
+                </div>
+
+                {/* Acciones */}
+                <div className="flex flex-wrap justify-center gap-3">
+                    <button
+                        onClick={() => setActivePanel && setActivePanel("config")}
+                        className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition"
+                    >
+                        <FiEdit2 /> Editar perfil
+                    </button>
+                    <button
+                        onClick={() => setActivePanel && setActivePanel("password")}
+                        className="flex items-center gap-2 bg-gray-100 text-gray-800 px-5 py-2 rounded-lg hover:bg-gray-200 transition"
+                    >
+                        <FiLock /> Cambiar contraseña
+                    </button>
+                    <button
+                        onClick={logout}
+                        className="flex items-center gap-2 bg-red-50 text-red-600 px-5 py-2 rounded-lg hover:bg-red-100 transition"
+                    >
+                        <FiLogOut /> Cerrar sesión
+                    </button>
                 </div>
 
                 <button
                     onClick={onBack}
-                    className="mt-6 bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition"
+                    className="mt-8 text-sm text-blue-600 hover:underline"
                 >
                     Volver al panel
                 </button>

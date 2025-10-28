@@ -46,7 +46,7 @@ export function useAuth() {
                 } else {
                     window.location.href = "/user/dashboard";
                 }
-            }, 1600);
+            }, 500);
 
             return userData;
         } catch (error: any) {
