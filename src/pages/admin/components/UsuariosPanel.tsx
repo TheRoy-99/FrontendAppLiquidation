@@ -21,11 +21,13 @@ import {
     FiLock,
     FiEye,
     FiEyeOff,
+    FiX,
 } from "react-icons/fi";
 
 export default function UsuariosPanel({ onBack }: { onBack?: () => void }) {
     const [users, setUsers] = useState<any[]>([]);
     const [showPassword, setShowPassword] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [formData, setFormData] = useState({
         nombreCompleto: "",
         email: "",
@@ -55,6 +57,7 @@ export default function UsuariosPanel({ onBack }: { onBack?: () => void }) {
             await registerUser(formData);
             alertSuccess("Usuario registrado correctamente");
             setFormData({ nombreCompleto: "", email: "", telefono: "", password: "" });
+            setIsModalOpen(false);
             fetchUsers();
         } catch {
             alertError("No se pudo registrar el usuario");
@@ -102,7 +105,7 @@ export default function UsuariosPanel({ onBack }: { onBack?: () => void }) {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 relative">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-gray-800">
@@ -111,91 +114,116 @@ export default function UsuariosPanel({ onBack }: { onBack?: () => void }) {
                 {onBack && (
                     <button
                         onClick={onBack}
-                        className="flex items-center gap-1 text-blue-600 text-sm font-medium hover:underline"
+                        className="text-blue-600 text-sm font-medium hover:underline"
                     >
-                    Volver al panel
+                        Volver al panel
                     </button>
                 )}
             </div>
 
-            {/* Formulario de registro */}
-            <form
-                onSubmit={handleSubmit}
-                className="bg-gray-50 p-5 rounded-xl shadow-sm space-y-4"
+            {/* Botón abrir modal */}
+            <button
+                onClick={() => setIsModalOpen(true)}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center gap-2 font-medium shadow"
             >
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {/* Nombre */}
-                    <div className="relative">
-                        <FiUser className="absolute left-3 top-3 text-gray-400" />
-                        <input
-                            type="text"
-                            name="nombreCompleto"
-                            placeholder="Nombre completo"
-                            value={formData.nombreCompleto}
-                            onChange={handleChange}
-                            required
-                            className="pl-9 p-2 border rounded-md w-full focus:ring-1 focus:ring-blue-500"
-                        />
-                    </div>
+                <FiUserPlus /> Registrar Usuario
+            </button>
 
-                    {/* Correo */}
-                    <div className="relative">
-                        <FiMail className="absolute left-3 top-3 text-gray-400" />
-                        <input
-                            type="email"
-                            name="email"
-                            placeholder="Correo electrónico"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                            className="pl-9 p-2 border rounded-md w-full focus:ring-1 focus:ring-blue-500"
-                        />
-                    </div>
+            {/* Modal */}
+            {isModalOpen && (
+                <div className="fixed inset-0 flex items-center justify-center z-50">
+                    {/* Fondo desenfocado */}
+                    <div
+                        className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
+                        onClick={() => setIsModalOpen(false)}
+                    />
 
-                    {/* Teléfono */}
-                    <div className="relative">
-                        <FiPhone className="absolute left-3 top-3 text-gray-400" />
-                        <input
-                            type="text"
-                            name="telefono"
-                            placeholder="Teléfono"
-                            value={formData.telefono}
-                            onChange={handleChange}
-                            className="pl-9 p-2 border rounded-md w-full focus:ring-1 focus:ring-blue-500"
-                        />
-                    </div>
-
-                    {/* Contraseña */}
-                    <div className="relative">
-                        <FiLock className="absolute left-3 top-3 text-gray-400" />
-                        <input
-                            type={showPassword ? "text" : "password"}
-                            name="password"
-                            placeholder="Contraseña"
-                            value={formData.password}
-                            onChange={handleChange}
-                            required
-                            className="pl-9 pr-10 p-2 border rounded-md w-full focus:ring-1 focus:ring-blue-500"
-                        />
+                    {/* Contenedor del modal */}
+                    <div className="relative bg-white/80 backdrop-blur-xl border border-white/40 shadow-2xl rounded-2xl p-6 w-full max-w-md mx-4 animate-fadeIn">
+                        {/* Botón cerrar */}
                         <button
-                            type="button"
-                            onMouseDown={() => setShowPassword(true)}
-                            onMouseUp={() => setShowPassword(false)}
-                            onMouseLeave={() => setShowPassword(false)}
-                            className="absolute right-2 top-2 text-gray-500 hover:text-gray-700"
+                            onClick={() => setIsModalOpen(false)}
+                            className="absolute top-3 right-3 text-gray-600 hover:text-gray-800 transition"
                         >
-                            {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                            <FiX size={20} />
                         </button>
+
+                        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                            <FiUserPlus className="text-blue-600" /> Registrar nuevo usuario
+                        </h3>
+
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <div className="relative">
+                                <FiUser className="absolute left-3 top-3 text-gray-400" />
+                                <input
+                                    type="text"
+                                    name="nombreCompleto"
+                                    placeholder="Nombre completo"
+                                    value={formData.nombreCompleto}
+                                    onChange={handleChange}
+                                    required
+                                    className="pl-9 p-2 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 bg-white/60 backdrop-blur-sm"
+                                />
+                            </div>
+
+                            <div className="relative">
+                                <FiMail className="absolute left-3 top-3 text-gray-400" />
+                                <input
+                                    type="email"
+                                    name="email"
+                                    placeholder="Correo electrónico"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    required
+                                    className="pl-9 p-2 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 bg-white/60 backdrop-blur-sm"
+                                />
+                            </div>
+
+                            <div className="relative">
+                                <FiPhone className="absolute left-3 top-3 text-gray-400" />
+                                <input
+                                    type="text"
+                                    name="telefono"
+                                    placeholder="Teléfono"
+                                    value={formData.telefono}
+                                    onChange={handleChange}
+                                    className="pl-9 p-2 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 bg-white/60 backdrop-blur-sm"
+                                />
+                            </div>
+
+                            <div className="relative">
+                                <FiLock className="absolute left-3 top-3 text-gray-400" />
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    name="password"
+                                    placeholder="Contraseña"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    required
+                                    className="pl-9 pr-10 p-2 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 bg-white/60 backdrop-blur-sm"
+                                />
+                                <button
+                                    type="button"
+                                    onMouseDown={() => setShowPassword(true)}
+                                    onMouseUp={() => setShowPassword(false)}
+                                    onMouseLeave={() => setShowPassword(false)}
+                                    className="absolute right-2 top-2 text-gray-500 hover:text-gray-700"
+                                >
+                                    {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                                </button>
+                            </div>
+
+                            <button
+                                type="submit"
+                                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 active:scale-95 transition w-full flex items-center justify-center gap-2 font-medium shadow-lg"
+                            >
+                                <FiUserPlus /> Registrar
+                            </button>
+                        </form>
                     </div>
                 </div>
+            )}
 
-                <button
-                    type="submit"
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full sm:w-auto flex items-center justify-center gap-2 font-medium"
-                >
-                    <FiUserPlus /> Registrar Usuario
-                </button>
-            </form>
 
             {/* Lista de usuarios */}
             <div className="space-y-3">
@@ -214,19 +242,18 @@ export default function UsuariosPanel({ onBack }: { onBack?: () => void }) {
                         <div className="flex items-center gap-2 mt-3 sm:mt-0">
                             <span
                                 className={`px-3 py-1 text-xs font-semibold rounded-full ${u.role === "ADMIN"
-                                        ? "bg-blue-100 text-blue-700"
-                                        : "bg-green-100 text-green-700"
+                                    ? "bg-blue-100 text-blue-700"
+                                    : "bg-green-100 text-green-700"
                                     }`}
                             >
                                 {u.role}
                             </span>
 
-                            {/* Cambiar rol */}
                             <button
                                 onClick={() => handleChangeRole(u.id, u.role)}
                                 className={`p-2 rounded-lg transition-all ${u.role === "ADMIN"
-                                        ? "text-green-600 hover:bg-green-50"
-                                        : "text-blue-600 hover:bg-blue-50"
+                                    ? "text-green-600 hover:bg-green-50"
+                                    : "text-blue-600 hover:bg-blue-50"
                                     }`}
                                 title={
                                     u.role === "ADMIN"
@@ -241,7 +268,6 @@ export default function UsuariosPanel({ onBack }: { onBack?: () => void }) {
                                 )}
                             </button>
 
-                            {/* Eliminar */}
                             <button
                                 onClick={() => handleDelete(u.id, u.role)}
                                 className="p-2 rounded-lg text-red-600 hover:bg-red-50 transition-all"

@@ -1,15 +1,14 @@
 import { useEffect, useState, useRef } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import {
-    FiUser,
-    FiSettings,
-    FiLogOut,
-    FiMenu,
     FiUserPlus,
     FiFileText,
     FiBarChart2,
+    FiLogOut,
+    FiUser,
+    FiMenu,
 } from "react-icons/fi";
-import { alertError, alertSuccess, confirmLogoutAlert } from "../../utils/alerts";
+import { alertError, alertInfo, alertSuccess, confirmAlert, confirmLogoutAlert } from "../../utils/alerts";
 import UsuariosPanel from "./components/UsuariosPanel";
 import RecibosPanel from "./components/RecibosPanel";
 import ReportesPanel from "./components/ReportesPanel";
@@ -20,14 +19,15 @@ import {
     getReportesGenerales,
 } from "../../services/adminService";
 import ChangePasswordForm from "./components/ChangePasswordForm";
-import api from "../../services/api";
 import PerfilAdmin from "./components/PerfilAdmin";
+import api from "../../services/api";
 
 export default function DashboardAdmin() {
     const { user, logout } = useAuth();
     const [nombre, setNombre] = useState("");
-    const [menuOpen, setMenuOpen] = useState(false);
     const [activePanel, setActivePanel] = useState("inicio");
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
     // métricas
@@ -38,13 +38,11 @@ export default function DashboardAdmin() {
 
     useEffect(() => {
         if (user && !nombre) {
-            setNombre(
-                user.nombreCompleto || user.email?.split("@")[0] || "Administrador"
-            );
+            setNombre(user.nombreCompleto || user.email?.split("@")[0] || "Administrador");
         }
     }, [user, nombre]);
 
-    // Cargar métricas
+    // cargar métricas
     useEffect(() => {
         async function fetchData() {
             try {
@@ -66,6 +64,7 @@ export default function DashboardAdmin() {
         if (confirmed) logout();
     };
 
+    // cerrar menú si se hace clic fuera
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
             if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
@@ -86,40 +85,59 @@ export default function DashboardAdmin() {
 
     return (
         <div className="flex min-h-screen bg-gray-50">
-            {/* Sidebar solo visible en escritorio */}
-            <SidebarAdmin activePanel={activePanel} setActivePanel={setActivePanel} />
+            {/* Sidebar responsive */}
+            <SidebarAdmin
+                activePanel={activePanel}
+                setActivePanel={setActivePanel}
+                isOpen={isSidebarOpen}
+                setIsOpen={setIsSidebarOpen}
+            />
 
             {/* Contenedor principal */}
             <div className="flex-1 flex flex-col overflow-hidden">
-                {/* Header */}
-                <header className="bg-white shadow-sm px-6 py-4 flex justify-between items-center relative">
-                    <h1 className="text-xl sm:text-2xl font-bold text-gray-800">
-                        Servicios Públicos
-                    </h1>
+                {/* Header superior */}
+                <header className="bg-white shadow-sm px-4 sm:px-6 py-4 flex justify-between items-center relative">
+                    <div className="flex items-center gap-3">
+                        {/* Botón menú móvil */}
+                        <button
+                            onClick={() => setIsSidebarOpen(true)}
+                            className="md:hidden p-2 rounded-md hover:bg-gray-100 transition"
+                            aria-label="Abrir menú lateral"
+                        >
+                            <FiMenu className="text-gray-700" size={22} />
+                        </button>
 
-                    <div className="flex items-center gap-3" ref={menuRef}>
+                        <h1 className="text-lg sm:text-2xl font-bold text-gray-800">
+                            Servicios Públicos
+                        </h1>
+                    </div>
+
+                    <div className="flex items-center gap-3 relative" ref={menuRef}>
                         <div className="text-right hidden sm:block">
                             <h2 className="text-sm font-semibold text-gray-800">{nombre}</h2>
-                            <p className="text-xs text-gray-500">Administrador</p>
+                            <p className="text-xs text-gray-500 capitalize">{user?.role?.toLowerCase()}</p>
                         </div>
 
+                        {/* Avatar */}
                         <div className="w-9 h-9 flex items-center justify-center rounded-full bg-blue-600 text-white font-semibold shadow">
                             {initials}
                         </div>
 
-                        {/* Menú móvil */}
+                        {/* Menú superior */}
                         <button
                             onClick={() => setMenuOpen(!menuOpen)}
-                            className="p-2 rounded-md hover:bg-gray-100 transition lg:hidden"
+                            className="p-2 rounded-md hover:bg-gray-100 transition"
+                            aria-label="Abrir menú de usuario"
                         >
                             <FiMenu
-                                className={`w-6 h-6 text-gray-600 transition-transform duration-200 ${menuOpen ? "rotate-90 text-blue-600" : ""
+                                size={20}
+                                className={`text-gray-700 transition-transform duration-200 ${menuOpen ? "rotate-90 text-blue-600" : ""
                                     }`}
                             />
                         </button>
 
                         {menuOpen && (
-                            <div className="absolute right-0 top-14 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-10">
+                            <div className="absolute right-0 top-12 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-20">
                                 <button
                                     onClick={() => {
                                         setActivePanel("perfil");
@@ -127,17 +145,7 @@ export default function DashboardAdmin() {
                                     }}
                                     className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-gray-100 transition"
                                 >
-                                    <FiUser className="mr-2" /> Perfil
-                                </button>
-
-                                <button
-                                    onClick={() => {
-                                        setActivePanel("config");
-                                        setMenuOpen(false);
-                                    }}
-                                    className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-gray-100 transition"
-                                >
-                                    <FiSettings className="mr-2" /> Configuración
+                                    <FiUser className="mr-2" /> Ver perfil
                                 </button>
 
                                 <button
@@ -154,15 +162,13 @@ export default function DashboardAdmin() {
                 {/* Contenido dinámico */}
                 <main className="flex-grow w-full max-w-4xl mx-auto px-4 sm:px-8 py-10 overflow-y-auto">
                     <div className="bg-white rounded-2xl shadow-md p-6 sm:p-8 transition-all">
-                        {/* Panel principal */}
                         {activePanel === "inicio" && (
                             <>
                                 <h2 className="text-lg font-semibold text-gray-800 mb-3">
                                     Panel del Administrador
                                 </h2>
                                 <p className="text-gray-600 mb-8">
-                                    Aquí podrás registrar usuarios, revisar recibos y acceder a
-                                    reportes.
+                                    Aquí podrás registrar usuarios, revisar recibos y acceder a reportes.
                                 </p>
 
                                 {/* Métricas */}
@@ -211,7 +217,6 @@ export default function DashboardAdmin() {
                             </>
                         )}
 
-                        {/* Paneles dinámicos */}
                         {activePanel === "usuarios" && (
                             <UsuariosPanel onBack={() => setActivePanel("inicio")} />
                         )}
@@ -224,126 +229,157 @@ export default function DashboardAdmin() {
                         {activePanel === "password" && (
                             <ChangePasswordForm onBack={() => setActivePanel("config")} />
                         )}
+
                         {activePanel === "config" && (
                             <div>
                                 <h2 className="text-lg font-semibold text-gray-800 mb-2">
-                                    Información personal
+                                    Configuración general
                                 </h2>
-                                <p className="text-sm text-gray-500 mb-6">
-                                    Aquí puedes actualizar tu nombre y número de teléfono asociados a tu cuenta.
+                                <p className="text-sm text-gray-500 mb-8">
+                                    Personaliza la apariencia y las preferencias de tu cuenta.
                                 </p>
 
-                                {/* Estado local para mostrar confirmación visual */}
-                                {saved && (
-                                    <p className="text-green-600 text-sm mb-4">
-                                        ✔ Cambios guardados correctamente.
-                                    </p>
-                                )}
+                                <div className="space-y-10 max-w-lg mx-auto divide-y divide-gray-200">
+                                    {/* Apariencia */}
+                                    <section className="pt-0">
+                                        <h3 className="text-md font-semibold text-gray-700 mb-3">Apariencia</h3>
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-gray-700">Tema del panel</span>
+                                            <button
+                                                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+                                                onClick={() =>
+                                                    alertInfo("Función de cambio de tema próximamente disponible.")
+                                                }
+                                            >
+                                                Cambiar tema
+                                            </button>
+                                        </div>
+                                    </section>
 
-                                {/* Formulario para actualizar datos */}
-                                <form
-                                    onSubmit={async (e) => {
-                                        e.preventDefault();
+                                    {/* Notificaciones */}
+                                    <section className="pt-6">
+                                        <h3 className="text-md font-semibold text-gray-700 mb-3">
+                                            Notificaciones
+                                        </h3>
+                                        <div className="space-y-3">
+                                            <label className="flex items-center gap-3">
+                                                <input
+                                                    type="checkbox"
+                                                    className="accent-blue-600"
+                                                    defaultChecked
+                                                    onChange={(e) =>
+                                                        localStorage.setItem(
+                                                            "notifySuccess",
+                                                            e.target.checked ? "on" : "off"
+                                                        )
+                                                    }
+                                                />
+                                                <span className="text-gray-700">
+                                                    Mostrar alertas de éxito y error
+                                                </span>
+                                            </label>
 
-                                        const nombreCompleto = (e.currentTarget.elements.namedItem("nombreCompleto") as HTMLInputElement).value;
-                                        const telefono = (e.currentTarget.elements.namedItem("telefono") as HTMLInputElement).value;
+                                            <label className="flex items-center gap-3">
+                                                <input
+                                                    type="checkbox"
+                                                    className="accent-blue-600"
+                                                    defaultChecked
+                                                    onChange={(e) =>
+                                                        localStorage.setItem(
+                                                            "notifyReports",
+                                                            e.target.checked ? "on" : "off"
+                                                        )
+                                                    }
+                                                />
+                                                <span className="text-gray-700">
+                                                    Alertarme sobre nuevos reportes
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </section>
 
-                                        try {
-                                            const token = localStorage.getItem("token");
-                                            if (!token) throw new Error("No se encontró token");
+                                    {/* Idioma */}
+                                    <section className="pt-6">
+                                        <h3 className="text-md font-semibold text-gray-700 mb-3">
+                                            Idioma y región
+                                        </h3>
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-gray-700">Idioma de la interfaz</span>
+                                            <select
+                                                className="border rounded-lg p-2 focus:ring-2 focus:ring-blue-500"
+                                                defaultValue="es"
+                                                onChange={() =>
+                                                    alertInfo("Cambio de idioma disponible próximamente.")
+                                                }
+                                            >
+                                                <option value="es">Español</option>
+                                                <option value="en">Inglés</option>
+                                            </select>
+                                        </div>
+                                    </section>
 
-                                            await api.patch(
-                                                "/users/me",
-                                                { nombreCompleto, telefono },
-                                                { headers: { Authorization: `Bearer ${token}` } }
-                                            );
+                                    {/* Sistema */}
+                                    <section className="pt-6">
+                                        <h3 className="text-md font-semibold text-gray-700 mb-3">
+                                            Opciones del sistema
+                                        </h3>
+                                        <div className="space-y-3">
+                                            <button
+                                                onClick={() => alertInfo("Función de respaldo próximamente.")}
+                                                className="w-full bg-blue-50 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-100 transition"
+                                            >
+                                                Generar respaldo de datos
+                                            </button>
 
-                                            alertSuccess("Datos actualizados correctamente");
-                                            setSaved(true);
-                                            setTimeout(() => setSaved(false), 3000);
-                                        } catch (err: any) {
-                                            console.error(err);
-                                            alertError(
-                                                "Error al actualizar los datos",
-                                                err.response?.data?.message
-                                            );
-                                        }
-                                    }}
-                                    className="space-y-4 max-w-lg mx-auto"
-                                >
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Nombre completo
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="nombreCompleto"
-                                            placeholder="Ej. Roy Martínez"
-                                            defaultValue={user?.nombreCompleto || ""}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        />
+                                            <button
+                                                onClick={async () => {
+                                                    const confirmed = await confirmAlert(
+                                                        "¿Limpiar caché local?",
+                                                        "Esto eliminará las preferencias guardadas, pero mantendrá tu sesión activa.",
+                                                        "Sí, limpiar",
+                                                        "Cancelar"
+                                                    );
+                                                    if (confirmed) {
+                                                        const token = localStorage.getItem("token");
+                                                        const user = localStorage.getItem("user");
+                                                        localStorage.clear();
+                                                        if (token) localStorage.setItem("token", token);
+                                                        if (user) localStorage.setItem("user", user);
+                                                        alertSuccess("Caché limpiada correctamente");
+                                                    }
+                                                }}
+                                                className="w-full bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition"
+                                            >
+                                                Limpiar caché local
+                                            </button>
+                                        </div>
+                                    </section>
+
+                                    {/* Volver */}
+                                    <div className="pt-8 text-center">
+                                        <button
+                                            onClick={() => setActivePanel("inicio")}
+                                            className="bg-gray-100 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-200 transition"
+                                        >
+                                            Volver al panel
+                                        </button>
                                     </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Teléfono
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="telefono"
-                                            placeholder="Ej. 3124567890"
-                                            defaultValue={user?.telefono || ""}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        />
-                                    </div>
-
-                                    <button
-                                        type="submit"
-                                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-                                    >
-                                        Actualizar información
-                                    </button>
-                                </form>
-
-                                {/* Bloque de seguridad */}
-                                <div className="mt-10 border-t pt-6 max-w-lg mx-auto">
-                                    <h3 className="text-md font-semibold text-gray-700 mb-3">
-                                        Seguridad
-                                    </h3>
-                                    <p className="text-sm text-gray-600 mb-4">
-                                        Puedes cambiar tu contraseña en cualquier momento.
-                                    </p>
-                                    <button
-                                        onClick={() => setActivePanel("password")}
-                                        className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-100 transition"
-                                    >
-                                        Cambiar contraseña
-                                    </button>
-                                </div>
-
-                                <div className="mt-8 max-w-lg mx-auto">
-                                    <button
-                                        onClick={() => setActivePanel("inicio")}
-                                        className="bg-gray-100 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-200 transition"
-                                    >
-                                        Volver al panel
-                                    </button>
                                 </div>
                             </div>
                         )}
 
 
 
-                        {/* Panel PERFIL */}
+
                         {activePanel === "perfil" && (
                             <div>
                                 <h2 className="text-lg font-semibold text-gray-800 mb-4">Mi Perfil</h2>
-
-                                {/* Estado local para datos */}
-                                <PerfilAdmin onBack={() => setActivePanel("inicio")} />
+                                <PerfilAdmin
+                                    onBack={() => setActivePanel("inicio")}
+                                    setActivePanel={setActivePanel}
+                                />
                             </div>
                         )}
-
                     </div>
                 </main>
             </div>
