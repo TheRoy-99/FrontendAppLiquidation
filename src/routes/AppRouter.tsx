@@ -13,12 +13,10 @@ export function AppRouter() {
     user = null;
   }
 
-
-
   return (
     <BrowserRouter>
       <Routes>
-        {/*Redirección inicial */}
+        {/* Redirección inicial */}
         <Route
           path="/"
           element={

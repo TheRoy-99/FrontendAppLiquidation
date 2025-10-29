@@ -23,7 +23,7 @@ export const alertWelcome = (nombre: string) => {
     title: `¡Bienvenido, ${nombre}!`,
     text: "Inicio de sesión exitoso.",
     showConfirmButton: false,
-    timer: 3000, // ⏱️ ahora dura 3 segundos
+    timer: 3000,
     timerProgressBar: true,
     background: "#ffffff",
   });
@@ -97,7 +97,7 @@ export const confirmLogoutAlert = async (p0: string): Promise<boolean> => {
     confirmButtonText: "Sí, cerrar sesión",
     cancelButtonText: "Cancelar",
     confirmButtonColor: "#1976d2",
-    cancelButtonColor: "#e53935",
+    cancelButtonColor: "#6c757d",
     reverseButtons: true,
   });
 
@@ -107,7 +107,7 @@ export const confirmLogoutAlert = async (p0: string): Promise<boolean> => {
       icon: "success",
       title: "Sesión cerrada",
       text: "Has cerrado sesión correctamente.",
-      timer: 1800, // un poquito más larga
+      timer: 1800,
       showConfirmButton: false,
     });
     return true;
@@ -116,7 +116,51 @@ export const confirmLogoutAlert = async (p0: string): Promise<boolean> => {
   return false;
 };
 
-// Alerta específica para inicio de sesión exitoso (idéntica a alertWelcome)
+//NUEVO: Confirmación específica para aprobar
+export const confirmApproveAlert = async (
+  message: string = "¿Aprobar este recibo?",
+  detail?: string
+): Promise<boolean> => {
+  const result = await Swal.fire({
+    ...baseConfig,
+    title: message,
+    text: detail || "Esta acción no se puede revertir.",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonText: "Sí, aprobar",
+    cancelButtonText: "Cancelar",
+    confirmButtonColor: "#28a745", // verde para aprobar
+    cancelButtonColor: "#6c757d",
+    reverseButtons: true,
+    iconColor: "#28a745",
+  });
+
+  return result.isConfirmed;
+};
+
+//NUEVO: Confirmación específica para rechazar
+export const confirmRejectAlert = async (
+  message: string = "¿Rechazar este recibo?",
+  detail?: string
+): Promise<boolean> => {
+  const result = await Swal.fire({
+    ...baseConfig,
+    title: message,
+    text: detail || "Esta acción no se puede revertir.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Sí, rechazar",
+    cancelButtonText: "Cancelar",
+    confirmButtonColor: "#ffc107", // amarillo/naranja para rechazar
+    cancelButtonColor: "#6c757d",
+    reverseButtons: true,
+    iconColor: "#ffc107",
+  });
+
+  return result.isConfirmed;
+};
+
+// Alerta específica para inicio de sesión exitoso
 export const alertLoginSuccess = (nombre?: string) => {
   Swal.fire({
     ...baseConfig,
