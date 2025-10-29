@@ -194,3 +194,25 @@ export const confirmAlert = async (
   });
   return result.isConfirmed;
 };
+
+// Confirmación específica para eliminar
+export const confirmDeleteAlert = async (
+  message: string = "¿Deseas eliminar este elemento?",
+  detail: string = "Esta acción no se puede revertir."
+): Promise<boolean> => {
+  const result = await Swal.fire({
+    ...baseConfig,
+    title: message,
+    text: detail,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Sí, eliminar",
+    cancelButtonText: "Cancelar",
+    confirmButtonColor: "#e53935", // rojo de tu esquema
+    cancelButtonColor: "#6c757d",
+    reverseButtons: true,
+    iconColor: "#e53935",
+  });
+
+  return result.isConfirmed;
+};
