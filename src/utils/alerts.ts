@@ -87,7 +87,7 @@ export const alertWarning = (title: string, text?: string) => {
 };
 
 // Confirmación de logout
-export const confirmLogoutAlert = async (): Promise<boolean> => {
+export const confirmLogoutAlert = async (p0: string): Promise<boolean> => {
   const result = await Swal.fire({
     ...baseConfig,
     title: "¿Cerrar sesión?",
@@ -127,4 +127,26 @@ export const alertLoginSuccess = (nombre?: string) => {
     timer: 3000,
     timerProgressBar: true,
   });
+};
+
+// Confirmación genérica reutilizable
+export const confirmAlert = async (
+  title: string,
+  text: string,
+  confirmText: string = "Aceptar",
+  cancelText: string = "Cancelar"
+): Promise<boolean> => {
+  const result = await Swal.fire({
+    ...baseConfig,
+    title,
+    text,
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonText: confirmText,
+    cancelButtonText: cancelText,
+    confirmButtonColor: "#1976d2",
+    cancelButtonColor: "#e53935",
+    reverseButtons: true,
+  });
+  return result.isConfirmed;
 };

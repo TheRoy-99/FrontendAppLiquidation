@@ -23,4 +23,13 @@ export const authService = {
   recover: (email: string) => api.post("/auth/recover", { email }),
   resetPassword: (data: ResetPasswordPayload) =>
     api.post("/auth/reset-password", data),
+
+  changePassword: (oldPassword: string, newPassword: string, token: string | null) =>
+  api.patch(
+    "/users/me/password",
+    { oldPassword, newPassword },
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  ),
 };
