@@ -86,52 +86,7 @@ export const alertWarning = (title: string, text?: string) => {
   });
 };
 
-//Confirmación genérica (acepta título y texto personalizados)
-export const confirmAlert = async (
-  title: string,
-  text?: string,
-  confirmButtonText: string = "Confirmar",
-  cancelButtonText: string = "Cancelar"
-): Promise<boolean> => {
-  const result = await Swal.fire({
-    ...baseConfig,
-    title,
-    text,
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonText,
-    cancelButtonText,
-    confirmButtonColor: "#1976d2",
-    cancelButtonColor: "#6c757d",
-    reverseButtons: true,
-  });
-
-  return result.isConfirmed;
-};
-
-//Confirmación específica para eliminar
-export const confirmDeleteAlert = async (
-  message: string = "¿Eliminar este elemento?",
-  detail?: string
-): Promise<boolean> => {
-  const result = await Swal.fire({
-    ...baseConfig,
-    title: message,
-    text: detail || "Esta acción no se puede deshacer.",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonText: "Sí, eliminar",
-    cancelButtonText: "Cancelar",
-    confirmButtonColor: "#e53935", // rojo para eliminar
-    cancelButtonColor: "#6c757d",
-    reverseButtons: true,
-    iconColor: "#e53935",
-  });
-
-  return result.isConfirmed;
-};
-
-//CORREGIDO: Confirmación de logout (ahora solo para cerrar sesión)
+// Confirmación de logout
 export const confirmLogoutAlert = async (p0: string): Promise<boolean> => {
   const result = await Swal.fire({
     ...baseConfig,
@@ -218,21 +173,24 @@ export const alertLoginSuccess = (nombre?: string) => {
   });
 };
 
-//Alerta de carga (loading)
-export const alertLoading = (message: string = "Procesando...") => {
-  Swal.fire({
+// Confirmación genérica reutilizable
+export const confirmAlert = async (
+  title: string,
+  text: string,
+  confirmText: string = "Aceptar",
+  cancelText: string = "Cancelar"
+): Promise<boolean> => {
+  const result = await Swal.fire({
     ...baseConfig,
-    title: message,
-    allowOutsideClick: false,
-    allowEscapeKey: false,
-    showConfirmButton: false,
-    didOpen: () => {
-      Swal.showLoading();
-    },
+    title,
+    text,
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonText: confirmText,
+    cancelButtonText: cancelText,
+    confirmButtonColor: "#1976d2",
+    cancelButtonColor: "#e53935",
+    reverseButtons: true,
   });
-};
-
-//Cerrar alerta de carga
-export const closeAlert = () => {
-  Swal.close();
+  return result.isConfirmed;
 };

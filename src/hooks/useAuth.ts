@@ -46,7 +46,7 @@ export function useAuth() {
                 } else {
                     window.location.href = "/user/dashboard";
                 }
-            }, 500);
+            }, 500); // Espera breve para que la alerta se vea completa
 
             return userData;
         } catch (error: any) {
@@ -69,7 +69,7 @@ export function useAuth() {
 
         setTimeout(() => {
             window.location.href = "/login";
-        }, 1500);
+        }, 500);
     };
 
     // Registro

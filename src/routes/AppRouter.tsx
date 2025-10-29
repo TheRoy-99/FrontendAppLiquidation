@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Login from "../pages/Login";
 import { ProtectedRoute } from "../components/ProtectedRoute";
 import DashboardAdmin from "../pages/admin/DashboardAdmin";
@@ -35,6 +35,7 @@ export function AppRouter() {
         {/* Login */}
         <Route path="/login" element={<LoginWrapper />} />
 
+
         {/* USER Dashboard */}
         <Route
           path="/user/dashboard"
@@ -64,5 +65,8 @@ export function AppRouter() {
 
 // Wrapper para Login
 function LoginWrapper() {
-  return <Login onForgotPassword={() => {}} />; // deshabilitado
+  const navigate = useNavigate();
+  return (
+    <Login onForgotPassword={() => navigate("/recover")} />
+  );
 }

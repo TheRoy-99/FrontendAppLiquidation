@@ -24,13 +24,12 @@ export const authService = {
   resetPassword: (data: ResetPasswordPayload) =>
     api.post("/auth/reset-password", data),
 
-  //cambio de contraseña autenticado
   changePassword: (oldPassword: string, newPassword: string, token: string | null) =>
-    api.patch(
-      "/users/me/password",
-      { oldPassword, newPassword },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    ),
+  api.patch(
+    "/users/me/password",
+    { oldPassword, newPassword },
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  ),
 };
