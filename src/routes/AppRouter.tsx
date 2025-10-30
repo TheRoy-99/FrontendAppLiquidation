@@ -1,22 +1,19 @@
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Login from "../pages/Login";
+import Principal from "../pages/Principal";
+import Chatbot from "../pages/ChatBot";
 import { ProtectedRoute } from "../components/ProtectedRoute";
 import DashboardAdmin from "../pages/admin/DashboardAdmin";
 import DashboardUser from "../pages/user/DashboardUser";
+import { useAuth } from "../hooks/useAuth";
 
 export function AppRouter() {
-  let user = null;
-  try {
-    const stored = localStorage.getItem("user");
-    user = stored ? JSON.parse(stored) : null;
-  } catch {
-    user = null;
-  }
+  const { user } = useAuth();
 
   return (
     <BrowserRouter>
       <Routes>
-        {/* Redirección inicial */}
+        {/* Landing pública */}
         <Route
           path="/"
           element={
@@ -27,16 +24,18 @@ export function AppRouter() {
                 <Navigate to="/user/dashboard" replace />
               )
             ) : (
-              <Navigate to="/login" replace />
+              <Principal />
             )
           }
         />
 
+        {/* Chatbot informativo */}
+        <Route path="/chatbot" element={<Chatbot />} />
+
         {/* Login */}
         <Route path="/login" element={<LoginWrapper />} />
 
-
-        {/* USER Dashboard */}
+        {/* Dashboard USER */}
         <Route
           path="/user/dashboard"
           element={
@@ -46,7 +45,7 @@ export function AppRouter() {
           }
         />
 
-        {/* ADMIN Dashboard */}
+        {/* Dashboard ADMIN */}
         <Route
           path="/admin/dashboard"
           element={
@@ -57,16 +56,14 @@ export function AppRouter() {
         />
 
         {/* Default */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
 }
 
-// Wrapper para Login
+// Wrapper para Login con navegación al recover
 function LoginWrapper() {
   const navigate = useNavigate();
-  return (
-    <Login onForgotPassword={() => navigate("/recover")} />
-  );
+  return <Login onForgotPassword={() => navigate("/recover")} />;
 }
