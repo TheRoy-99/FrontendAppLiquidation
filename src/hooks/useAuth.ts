@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { authService } from "../services/authService";
-const navigate = useNavigate();
 import {
     alertLoginSuccess,
     alertError,
@@ -8,11 +8,11 @@ import {
     alertSuccess,
 } from "../utils/alerts";
 import { jwtDecode } from "jwt-decode";
-import { useNavigate } from "react-router-dom";
 
 export function useAuth() {
     const [loading, setLoading] = useState(false);
     const [user, setUser] = useState<any>(null);
+    const navigate = useNavigate();
 
     // Recuperar sesión al recargar
     useEffect(() => {
@@ -41,10 +41,9 @@ export function useAuth() {
             setUser(userData);
 
             alertLoginSuccess(userData.nombreCompleto || userData.email?.split("@")[0]);
+            console.log("Redirigiendo a:", userData.role);
+            navigate(userData.role === "ADMIN" ? "/admin/dashboard" : "/user/dashboard");
 
-            setTimeout(() => {
-                navigate(userData.role === "ADMIN" ? "/admin/dashboard" : "/user/dashboard");
-            }, 500);
 
             return userData;
         } catch (error: any) {
@@ -58,7 +57,7 @@ export function useAuth() {
         }
     };
 
-    // Logout con confirmación
+    // Logout
     const logout = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
@@ -66,7 +65,7 @@ export function useAuth() {
         alertInfo("Sesión cerrada", "Has cerrado sesión correctamente");
 
         setTimeout(() => {
-            window.location.href = "/login";
+            navigate("/login");
         }, 500);
     };
 
@@ -85,7 +84,7 @@ export function useAuth() {
 
         setLoading(true);
         try {
-            const res = await authService.register({
+            await authService.register({
                 nombreCompleto: nombre,
                 email,
                 telefono,
@@ -127,7 +126,7 @@ export function useAuth() {
         }
     };
 
-    // Cambiar contraseña (nuevo)
+    // Cambiar contraseña
     const changePassword = async (oldPassword: string, newPassword: string) => {
         setLoading(true);
         try {

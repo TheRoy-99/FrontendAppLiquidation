@@ -168,7 +168,7 @@ export const alertLoginSuccess = (nombre?: string) => {
     title: `¡Bienvenido${nombre ? `, ${nombre}` : ""}!`,
     text: "Inicio de sesión exitoso.",
     showConfirmButton: false,
-    timer: 3000,
+    timer: 1200,
     timerProgressBar: true,
   });
 };

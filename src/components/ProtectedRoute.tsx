@@ -12,47 +12,43 @@ export function ProtectedRoute({ children, role }: ProtectedRouteProps) {
     const { user } = useAuth();
     const token = localStorage.getItem("token");
 
-    // No hay usuario ni token -> fuera
+    //Esperar a que el user se cargue del localStorage (no cortar de inmediato)
+    if (user === null && token) {
+        return (
+            <div className="flex items-center justify-center h-screen text-gray-600">
+                Cargando sesión...
+            </div>
+        );
+    }
+
+    //Sin usuario ni token -> login
     if (!user || !token) {
         localStorage.clear();
         return <Navigate to="/login" replace />;
     }
 
-    // Validar estructura del token
+    //Validar token
     let decoded: any = null;
     try {
         decoded = jwtDecode(token);
         if (!decoded?.exp || !decoded?.sub) {
-            if (import.meta.env.MODE === "development") {
-                console.warn("Token sin estructura válida");
-            }
             localStorage.clear();
             return <Navigate to="/login" replace />;
         }
-    } catch (error) {
-        if (import.meta.env.MODE === "development") {
-            console.warn("Token inválido:", error);
-        }
+    } catch {
         localStorage.clear();
         return <Navigate to="/login" replace />;
     }
 
-    //Verificar expiración del token
     const now = Date.now() / 1000;
     if (decoded.exp && decoded.exp < now) {
-        if (import.meta.env.MODE === "development") {
-            console.warn("Token expirado");
-        }
         localStorage.clear();
         return <Navigate to="/login" replace />;
     }
 
-    //Validar rol si aplica
+    //Verificar rol
     const userRole = user?.role;
     if (role && userRole !== role) {
-        if (import.meta.env.MODE === "development") {
-            console.warn("Acceso denegado: rol incorrecto");
-        }
         return userRole === "ADMIN" ? (
             <Navigate to="/admin/dashboard" replace />
         ) : (
@@ -60,6 +56,6 @@ export function ProtectedRoute({ children, role }: ProtectedRouteProps) {
         );
     }
 
-    //Todo correcto: permitir acceso
+    //Todo bien
     return children;
 }

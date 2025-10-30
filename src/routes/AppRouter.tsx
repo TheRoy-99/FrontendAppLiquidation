@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Login from "../pages/Login";
 import Principal from "../pages/Principal";
 import Chatbot from "../pages/ChatBot";
@@ -11,58 +11,48 @@ export function AppRouter() {
   const { user } = useAuth();
 
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Landing pública */}
-        <Route
-          path="/"
-          element={
-            user ? (
-              user.role === "ADMIN" ? (
-                <Navigate to="/admin/dashboard" replace />
-              ) : (
-                <Navigate to="/user/dashboard" replace />
-              )
+    <Routes>
+      <Route
+        path="/"
+        element={
+          user ? (
+            user.role === "ADMIN" ? (
+              <Navigate to="/admin/dashboard" replace />
             ) : (
-              <Principal />
+              <Navigate to="/user/dashboard" replace />
             )
-          }
-        />
+          ) : (
+            <Principal />
+          )
+        }
+      />
 
-        {/* Chatbot informativo */}
-        <Route path="/chatbot" element={<Chatbot />} />
+      <Route path="/chatbot" element={<Chatbot />} />
+      <Route path="/login" element={<LoginWrapper />} />
 
-        {/* Login */}
-        <Route path="/login" element={<LoginWrapper />} />
+      <Route
+        path="/user/dashboard"
+        element={
+          <ProtectedRoute role="USER">
+            <DashboardUser />
+          </ProtectedRoute>
+        }
+      />
 
-        {/* Dashboard USER */}
-        <Route
-          path="/user/dashboard"
-          element={
-            <ProtectedRoute role="USER">
-              <DashboardUser />
-            </ProtectedRoute>
-          }
-        />
+      <Route
+        path="/admin/dashboard"
+        element={
+          <ProtectedRoute role="ADMIN">
+            <DashboardAdmin />
+          </ProtectedRoute>
+        }
+      />
 
-        {/* Dashboard ADMIN */}
-        <Route
-          path="/admin/dashboard"
-          element={
-            <ProtectedRoute role="ADMIN">
-              <DashboardAdmin />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Default */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 
-// Wrapper para Login con navegación al recover
 function LoginWrapper() {
   const navigate = useNavigate();
   return <Login onForgotPassword={() => navigate("/recover")} />;
