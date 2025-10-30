@@ -8,6 +8,7 @@ export default {
         background: "var(--color-background)",
         error: "var(--color-error)",
         text: "var(--color-text)",
+        accent: "#ffca28",
       },
       fontFamily: {
         sans: ["Roboto", "sans-serif"],

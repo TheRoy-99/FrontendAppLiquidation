@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { authService } from "../services/authService";
+const navigate = useNavigate();
 import {
     alertLoginSuccess,
     alertError,
@@ -7,6 +8,7 @@ import {
     alertSuccess,
 } from "../utils/alerts";
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 export function useAuth() {
     const [loading, setLoading] = useState(false);
@@ -41,12 +43,8 @@ export function useAuth() {
             alertLoginSuccess(userData.nombreCompleto || userData.email?.split("@")[0]);
 
             setTimeout(() => {
-                if (userData.role === "ADMIN") {
-                    window.location.href = "/admin/dashboard";
-                } else {
-                    window.location.href = "/user/dashboard";
-                }
-            }, 500); // Espera breve para que la alerta se vea completa
+                navigate(userData.role === "ADMIN" ? "/admin/dashboard" : "/user/dashboard");
+            }, 500);
 
             return userData;
         } catch (error: any) {

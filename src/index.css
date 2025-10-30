@@ -1,4 +1,5 @@
 /* Importa Tailwind primero */
+
 @import "tailwindcss";
 
 /* Fuente global */
@@ -7,6 +8,10 @@
 @keyframes slideInRight {
   from { transform: translateX(100%); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 .animate-slideInRight {
