@@ -1,19 +1,28 @@
 import { useState } from "react";
 import { alertError, alertSuccess } from "../../../utils/alerts";
 import { authService } from "../../../services/authService";
+import { passwordsMatch } from "../../../utils/helpers";
 
-export default function ChangePasswordForm({ onBack }: { onBack: () => void }) {
+interface ChangePasswordFormProps {
+    onBack: () => void;
+}
+
+export default function ChangePasswordForm({ onBack }: ChangePasswordFormProps) {
     const [oldPassword, setOldPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (newPassword !== confirmPassword)
-            return alertError("Las contraseñas no coinciden");
+        if (!passwordsMatch(newPassword, confirmPassword)) {
+            alertError("Las contraseñas no coinciden");
+            return;
+        }
 
         try {
+            setLoading(true);
             const token = localStorage.getItem("token");
             await authService.changePassword(oldPassword, newPassword, token);
             alertSuccess("Contraseña actualizada correctamente");
@@ -23,6 +32,8 @@ export default function ChangePasswordForm({ onBack }: { onBack: () => void }) {
             onBack();
         } catch (err: any) {
             alertError("Error al cambiar la contraseña", err.response?.data?.message);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -54,7 +65,9 @@ export default function ChangePasswordForm({ onBack }: { onBack: () => void }) {
                 </div>
 
                 <div>
-                    <label className="text-sm text-gray-600">Confirmar nueva contraseña</label>
+                    <label className="text-sm text-gray-600">
+                        Confirmar nueva contraseña
+                    </label>
                     <input
                         type="password"
                         value={confirmPassword}
@@ -67,9 +80,13 @@ export default function ChangePasswordForm({ onBack }: { onBack: () => void }) {
                 <div className="flex gap-3 mt-4">
                     <button
                         type="submit"
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+                        disabled={loading}
+                        className={`bg-blue-600 text-white px-4 py-2 rounded-lg transition ${loading
+                                ? "opacity-60 cursor-not-allowed"
+                                : "hover:bg-blue-700 active:scale-95"
+                            }`}
                     >
-                        Guardar cambios
+                        {loading ? "Guardando..." : "Guardar cambios"}
                     </button>
                     <button
                         type="button"

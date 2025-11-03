@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
     FiHome,
     FiUsers,
@@ -7,6 +6,7 @@ import {
     FiSettings,
     FiX,
 } from "react-icons/fi";
+import { PANELS } from "../constants";
 
 interface SidebarAdminProps {
     activePanel: string;
@@ -21,6 +21,14 @@ export default function SidebarAdmin({
     isOpen,
     setIsOpen,
 }: SidebarAdminProps) {
+    const navItems = [
+        { key: PANELS.INICIO, icon: <FiHome />, label: "Inicio" },
+        { key: PANELS.USUARIOS, icon: <FiUsers />, label: "Usuarios" },
+        { key: PANELS.RECIBOS, icon: <FiFileText />, label: "Recibos" },
+        { key: PANELS.REPORTES, icon: <FiBarChart2 />, label: "Reportes" },
+        { key: PANELS.CONFIG, icon: <FiSettings />, label: "Configuración" },
+    ];
+
     const handleNav = (panel: string) => {
         setActivePanel(panel);
         setIsOpen(false);
@@ -28,20 +36,14 @@ export default function SidebarAdmin({
 
     return (
         <>
-            {/* 🔹 Sidebar para escritorio */}
+            {/* Sidebar escritorio */}
             <aside className="hidden md:flex w-56 bg-white border-r border-gray-200 flex-col py-6 px-4">
                 <h2 className="text-lg font-semibold text-gray-800 mb-6 px-2">
                     Panel Admin
                 </h2>
 
                 <nav className="flex-1 flex flex-col gap-1">
-                    {[
-                        { key: "inicio", icon: <FiHome />, label: "Inicio" },
-                        { key: "usuarios", icon: <FiUsers />, label: "Usuarios" },
-                        { key: "recibos", icon: <FiFileText />, label: "Recibos" },
-                        { key: "reportes", icon: <FiBarChart2 />, label: "Reportes" },
-                        { key: "config", icon: <FiSettings />, label: "Configuración" },
-                    ].map((item) => (
+                    {navItems.map((item) => (
                         <button
                             key={item.key}
                             onClick={() => handleNav(item.key)}
@@ -60,16 +62,16 @@ export default function SidebarAdmin({
                 </div>
             </aside>
 
-            {/* 🔹 Drawer lateral para móvil */}
+            {/* Sidebar móvil */}
             {isOpen && (
                 <div className="fixed inset-0 z-50 flex">
-                    {/* Fondo oscuro difuminado */}
+                    {/* Fondo oscuro */}
                     <div
                         className="flex-1 bg-black/40 backdrop-blur-sm"
                         onClick={() => setIsOpen(false)}
                     />
 
-                    {/* Panel lateral */}
+                    {/* Drawer lateral */}
                     <div className="w-64 bg-white h-full shadow-2xl p-5 flex flex-col animate-slideInRight">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-lg font-semibold text-gray-800">
@@ -84,13 +86,7 @@ export default function SidebarAdmin({
                         </div>
 
                         <nav className="flex-1 flex flex-col gap-1">
-                            {[
-                                { key: "inicio", icon: <FiHome />, label: "Inicio" },
-                                { key: "usuarios", icon: <FiUsers />, label: "Usuarios" },
-                                { key: "recibos", icon: <FiFileText />, label: "Recibos" },
-                                { key: "reportes", icon: <FiBarChart2 />, label: "Reportes" },
-                                { key: "config", icon: <FiSettings />, label: "Configuración" },
-                            ].map((item) => (
+                            {navItems.map((item) => (
                                 <button
                                     key={item.key}
                                     onClick={() => handleNav(item.key)}

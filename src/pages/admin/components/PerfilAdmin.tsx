@@ -3,15 +3,20 @@ import api from "../../../services/api";
 import { alertError } from "../../../utils/alerts";
 import { FiMail, FiPhone, FiEdit2, FiLock, FiLogOut } from "react-icons/fi";
 import { useAuth } from "../../../hooks/useAuth";
+import type { Perfil } from "../interfaces";
+import { getInitials } from "../../../utils/helpers";
+import { PANELS } from "../constants";
+
+interface PerfilAdminProps {
+    onBack: () => void;
+    setActivePanel?: (panel: string) => void;
+}
 
 export default function PerfilAdmin({
     onBack,
     setActivePanel,
-}: {
-    onBack: () => void;
-    setActivePanel?: (panel: string) => void;
-}) {
-    const [perfil, setPerfil] = useState<any>(null);
+}: PerfilAdminProps) {
+    const [perfil, setPerfil] = useState<Perfil | null>(null);
     const [loading, setLoading] = useState(true);
     const { logout } = useAuth();
 
@@ -20,7 +25,6 @@ export default function PerfilAdmin({
             try {
                 const token = localStorage.getItem("token");
                 if (!token) throw new Error("Token no encontrado");
-
                 const res = await api.get("/users/me", {
                     headers: { Authorization: `Bearer ${token}` },
                 });
@@ -44,20 +48,14 @@ export default function PerfilAdmin({
             </p>
         );
 
-    const initials =
-        perfil.nombreCompleto
-            ?.split(" ")
-            .map((n: string) => n[0])
-            .join("")
-            .toUpperCase()
-            .slice(0, 2) || "A";
+    const initials = getInitials(perfil.nombreCompleto);
 
     return (
         <div className="flex flex-col items-center justify-center text-center mt-6">
             <div className="max-w-lg w-full p-8">
                 {/* Avatar */}
                 <div className="relative w-28 h-28 mx-auto mb-5">
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-600 to-blue-400 p-[3px]">
+                    <div className="absolute inset-0 rounded-full bg-linear-to-r from-blue-600 to-blue-400 p-[3px]">
                         <div className="w-full h-full bg-white rounded-full flex items-center justify-center text-3xl font-bold text-blue-600">
                             {initials}
                         </div>
@@ -91,13 +89,13 @@ export default function PerfilAdmin({
                 {/* Acciones */}
                 <div className="flex flex-wrap justify-center gap-3">
                     <button
-                        onClick={() => setActivePanel && setActivePanel("config")}
+                        onClick={() => setActivePanel && setActivePanel(PANELS.CONFIG)}
                         className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition"
                     >
                         <FiEdit2 /> Editar perfil
                     </button>
                     <button
-                        onClick={() => setActivePanel && setActivePanel("password")}
+                        onClick={() => setActivePanel && setActivePanel(PANELS.PASSWORD)}
                         className="flex items-center gap-2 bg-gray-100 text-gray-800 px-5 py-2 rounded-lg hover:bg-gray-200 transition"
                     >
                         <FiLock /> Cambiar contraseña
