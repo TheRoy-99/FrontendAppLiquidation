@@ -21,7 +21,7 @@ export default function HeroSection() {
 
                     <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight tracking-tight">
                         Apoyo Financiero para{" "}
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-400">
+                        <span className="text-transparent bg-clip-text bg-linear-to-r from-yellow-400 to-yellow-300">
                             Misioneros
                         </span>
                     </h2>
@@ -63,7 +63,7 @@ export default function HeroSection() {
                             { value: "24/7", label: "Soporte continuo" },
                         ].map((stat, i) => (
                             <div key={i} className="text-center">
-                                <div className="text-3xl font-bold text-yellow-300">
+                                <div className="text-3xl font-bold text-white">
                                     {stat.value}
                                 </div>
                                 <div className="text-sm text-blue-200">{stat.label}</div>

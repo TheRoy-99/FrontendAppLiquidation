@@ -1,12 +1,12 @@
 export default function FooterLanding() {
     return (
-        <footer id="contacto" className="bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 text-white py-16">
+        <footer id="contacto" className="bg-linear-to-br from-gray-900 via-blue-900 to-gray-900 text-white py-16">
             <div className="max-w-7xl mx-auto px-6">
                 <div className="grid md:grid-cols-4 gap-12 mb-12">
                     {/* Marca */}
                     <div className="md:col-span-2 space-y-4">
                         <div className="flex items-center space-x-3 group">
-                            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform">
+                            <div className="w-12 h-12 bg-linear-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform">
                                 <span className="text-white font-bold text-xl">SL</span>
                             </div>
                             <div>
@@ -21,7 +21,7 @@ export default function FooterLanding() {
 
                     {/* Contacto */}
                     <div>
-                        <h6 className="text-lg font-bold mb-4 text-yellow-300">Contacto</h6>
+                        <h6 className="text-lg font-bold mb-4 text-white">Contacto</h6>
                         <ul className="space-y-3 text-blue-200">
                             <li className="flex items-center gap-2 hover:text-white transition-colors">
                                 <span>📍</span>
@@ -40,13 +40,13 @@ export default function FooterLanding() {
 
                     {/* Enlaces */}
                     <div>
-                        <h6 className="text-lg font-bold mb-4 text-yellow-300">Enlaces</h6>
+                        <h6 className="text-lg font-bold mb-4 text-white">Enlaces</h6>
                         <ul className="space-y-3 text-blue-200">
                             {["Iniciar Sesión", "Términos y Condiciones", "Política de Privacidad"].map((link) => (
                                 <li key={link}>
                                     <a
                                         href="#"
-                                        className="hover:text-yellow-300 transition-colors transform hover:translate-x-1 inline-block"
+                                        className="hover:text-white transition-colors transform hover:translate-x-1 inline-block"
                                     >
                                         {link}
                                     </a>

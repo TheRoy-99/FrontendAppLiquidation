@@ -69,7 +69,7 @@ export default function Login({ onForgotPassword }: LoginProps) {
 
             {/* Texto de bienvenida */}
             <div className="text-center space-y-3 max-w-sm">
-              <h1 className="text-5xl font-bold text-[#fbbf24] drop-shadow-lg">
+              <h1 className="text-5xl font-bold text-[#ffff] drop-shadow-lg">
                 Bienvenido
               </h1>
               <p className="text-lg text-white/90 leading-relaxed">

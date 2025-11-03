@@ -20,7 +20,7 @@ export default function HeaderLanding() {
             <div className="max-w-7xl mx-auto px-6 flex justify-between items-center py-5">
                 {/* Logo */}
                 <div className="flex items-center space-x-3 group">
-                    <div className="w-11 h-11 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg transform group-hover:scale-105 transition-transform duration-300">
+                    <div className="w-11 h-11 bg-linear-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg transform group-hover:scale-105 transition-transform duration-300">
                         <span className="text-white font-bold text-lg">SL</span>
                     </div>
                     <div>
@@ -63,7 +63,7 @@ export default function HeaderLanding() {
                     <a
                         href="/login"
                         className={`font-semibold px-6 py-2.5 rounded-xl shadow-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg ${scrolled
-                            ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800"
+                            ? "bg-linear-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800"
                             : "bg-white text-blue-600 hover:bg-blue-50"
                             }`}
                     >
